@@ -218,15 +218,21 @@ function render(){
   ov+='<div class="summary-grid">';
   sums.forEach(ss=>{
     const eqC=ss.eq<200000?'#dc2626':ss.eq<500000?'#ca8a04':'#1e40af';
-    const intStr=ss.int>0?fmtS(ss.int):ss.label==='Lifetime Home'?'~'+fmtS(ss.realCost-ss.cash)+' (equity given up)':'$0';
-    const intC=ss.int>50000||ss.realCost-ss.cash>100000?'#dc2626':'#64748b';
+    const isLT=ss.label==='Lifetime Home';
+    // Total debt line
+    const totalDebtStr=isLT?'No debt — 35% equity share':fmtS(ss.debt);
+    const totalDebtC=isLT?'#16a34a':'#dc2626';
+    // Interest sub-line
+    const intStr=isLT?'~'+fmtS(ss.realCost-ss.cash)+' in equity given up (no interest)':fmtS(ss.int)+' in interest';
+    const intC=ss.int>50000||(isLT&&ss.realCost-ss.cash>100000)?'#dc2626':'#64748b';
     let gapStr='';
-    if(ss.label==='Lifetime Home'){if(ltShortfall>0)gapStr=`⚠ Only pays ~${fmtDraw(ltAnnual)}/yr — stops Yr 10`;else if(yrs>10)gapStr='⚠ Income stops Year 10';else gapStr='✓ Funded'}
+    if(isLT){if(ltShortfall>0)gapStr=`⚠ Only pays ~${fmtDraw(ltAnnual)}/yr — stops Yr 10`;else if(yrs>10)gapStr='⚠ Income stops Year 10';else gapStr='✓ Funded'}
     else gapStr=ss.gap?'⚠ Limit at Year '+ss.gap:'✓ Funded for full period';
     const gapC=gapStr.startsWith('✓')?'#16a34a':'#dc2626';
     ov+=`<div class="summary-card" style="border-top:4px solid ${ss.color}"><div class="summary-label" style="color:${ss.color}">${ss.icon} ${ss.label}</div>
       <div class="summary-metric">Money you receive</div><div class="summary-value" style="color:#16a34a">${fmtS(ss.cash)}</div>
-      <div class="summary-metric" style="margin-top:10px">Real cost to you</div><div class="summary-value-sm" style="color:${intC}">${intStr}</div>
+      <div class="summary-metric" style="margin-top:10px">Total owed when house sells</div><div class="summary-value" style="color:${totalDebtC}">${totalDebtStr}</div>
+      <div style="font-size:11px;color:${intC};margin-top:2px">of which: ${intStr}</div>
       <div class="summary-metric" style="margin-top:10px">Your equity left</div><div class="summary-value" style="color:${eqC}">${fmtS(ss.eq)}</div>
       <div style="font-size:11px;color:#94a3b8">(${Math.round(ss.eqPct)}% of home)</div>
       <div class="summary-footer" style="color:${gapC}">${gapStr}</div></div>`;
