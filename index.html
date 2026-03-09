@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Home Equity Options — Mum & Dad</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif; background: #f8fafc; color: #334155; line-height: 1.5; }
+  .wrap { max-width: 1020px; margin: 0 auto; padding: 20px 16px; }
+  .header { background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%); border-radius: 20px; padding: 28px 28px 20px; margin-bottom: 24px; color: #fff; }
+  .header h1 { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 6px; }
+  .header p { opacity: 0.85; font-size: 14px; line-height: 1.6; }
+  .controls { background: #fff; border-radius: 14px; padding: 20px; margin-bottom: 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+  .ctrl-label { font-size: 12px; font-weight: 600; color: #64748b; display: block; margin-bottom: 4px; }
+  .ctrl-label strong { color: #1e293b; }
+  .ctrl-hint { font-size: 10px; color: #94a3b8; margin-top: 2px; }
+  input[type=range] { width: 100%; }
+  .tabs { display: flex; gap: 4px; overflow-x: auto; margin-bottom: 20px; padding: 4px; background: #e2e8f0; border-radius: 12px; }
+  .tab { padding: 9px 14px; border: none; border-radius: 9px; cursor: pointer; font-size: 13px; font-weight: 600; white-space: nowrap; background: transparent; color: #64748b; transition: all 0.2s; }
+  .tab.active { background: #fff; color: #1e3a5f; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+  .card { background: #fff; border-radius: 16px; padding: 24px; margin-bottom: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.06); }
+  .card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .card-icon { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  .card-title { font-size: 18px; font-weight: 700; }
+  .warn { background: #fffbeb; border: 1px solid #fbbf24; border-radius: 12px; padding: 16px; margin-bottom: 20px; font-size: 14px; line-height: 1.6; }
+  .warn strong { color: #92400e; }
+  .info-box { border-radius: 10px; padding: 14px; margin-bottom: 14px; font-size: 13px; line-height: 1.6; }
+  .info-green { background: #f0fdf4; border: 1px solid #86efac; color: #166534; }
+  .info-red { background: #fef2f2; border: 1px solid #fca5a5; color: #991b1b; }
+  .info-blue { background: #eff6ff; border: 1px solid #93c5fd; color: #1e40af; }
+  .info-yellow { background: #fefce8; border: 1px solid #fde047; color: #854d0e; }
+  .info-purple { background: #f5f3ff; border: 1px solid #c4b5fd; color: #5b21b6; }
+  .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .summary-card { background: #fff; border-radius: 14px; padding: 18px; box-shadow: 0 1px 6px rgba(0,0,0,0.06); }
+  .summary-label { font-size: 14px; font-weight: 700; margin-bottom: 12px; }
+  .summary-metric { font-size: 12px; color: #64748b; margin-bottom: 2px; }
+  .summary-value { font-size: 22px; font-weight: 800; }
+  .summary-value-sm { font-size: 16px; font-weight: 700; }
+  .summary-footer { font-size: 11px; margin-top: 10px; border-top: 1px solid #f1f5f9; padding-top: 6px; font-weight: 600; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { padding: 8px 10px; font-weight: 700; text-align: right; }
+  th:first-child, th:nth-child(2) { text-align: left; }
+  td { padding: 7px 10px; text-align: right; }
+  td:first-child, td:nth-child(2) { text-align: left; }
+  tr:nth-child(even) td { background: #f9fafb; }
+  .tbl-wrap { overflow-x: auto; margin-top: 12px; }
+  .cmp-table th { padding: 10px 12px; }
+  .cmp-table td { padding: 9px 12px; }
+  .bar-wrap { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+  .bar-label { font-size: 12px; font-weight: 600; margin-bottom: 3px; }
+  .bar-bg { background: #e2e8f0; border-radius: 8px; height: 32px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 8px; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; color: #fff; font-size: 13px; font-weight: 700; transition: width 0.5s ease; }
+  p { margin-bottom: 8px; }
+  .footer { text-align: center; font-size: 11px; color: #94a3b8; margin-top: 32px; padding: 16px 0; border-top: 1px solid #e2e8f0; }
+  .content-text { font-size: 14px; line-height: 1.7; color: #475569; }
+  .content-text p { margin-bottom: 8px; }
+  .next-steps p { margin-bottom: 8px; font-size: 14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <h1>Your Home, Your Future — Funding Options</h1>
+    <p>35 Cambie Ave, Red Beach — Home Value: $1,000,000<br>
+    This tool helps you compare four ways to get the extra $25,000/year you need,<br>
+    while keeping as much of your home's value as possible for your future security.</p>
+  </div>
+
+  <div class="controls">
+    <div>
+      <label class="ctrl-label">House price growth: <strong id="lbl-hg">2.5%</strong> per year</label>
+      <input type="range" id="sl-hg" min="0" max="5" step="0.5" value="2.5">
+      <div class="ctrl-hint">How much your home might go up in value each year</div>
+    </div>
+    <div>
+      <label class="ctrl-label">Reverse mortgage rate: <strong id="lbl-rm" style="color:#dc2626">9%</strong> per year</label>
+      <input type="range" id="sl-rm" min="7" max="12" step="0.25" value="9">
+      <div class="ctrl-hint">Heartland today: 7.75% | Typically 9-9.5% | Could go higher</div>
+    </div>
+    <div>
+      <label class="ctrl-label">Standard mortgage rate: <strong id="lbl-loc" style="color:#2563eb">5.5%</strong> per year</label>
+      <input type="range" id="sl-loc" min="4" max="8" step="0.25" value="5.5">
+      <div class="ctrl-hint">Current NZ rates: fixed ~4.5% | floating ~5.7%</div>
+    </div>
+    <div>
+      <label class="ctrl-label">How many years to plan for: <strong id="lbl-yr">13</strong></label>
+      <input type="range" id="sl-yr" min="5" max="20" step="1" value="13">
+    </div>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div id="tab-overview" class="tab-content active"></div>
+  <div id="tab-option1" class="tab-content"></div>
+  <div id="tab-option2" class="tab-content"></div>
+  <div id="tab-option3" class="tab-content"></div>
+  <div id="tab-option4" class="tab-content"></div>
+  <div id="tab-compare" class="tab-content"></div>
+  <div id="tab-recommendation" class="tab-content"></div>
+
+  <div class="footer">
+    This is a modelling tool to help you compare options — it is not financial advice. All numbers are estimates and will depend on actual interest rates and house price changes. Please get independent professional advice before making any decisions.
+  </div>
+</div>
+
+<script>
+const HV = 1000000, AN = 25000, MA = 75, SA = 80;
+let hg = 2.5, rmR = 9, locR = 5.5, yrs = 13, activeTab = 'overview';
+
+const tabDefs = [
+  { id: 'overview', label: 'Summary' },
+  { id: 'option1', label: '1. Reverse Mortgage' },
+  { id: 'option2', label: '2. Trust + LOC' },
+  { id: 'option3', label: '3. Lifetime Home' },
+  { id: 'option4', label: '4. Downsize' },
+  { id: 'compare', label: 'Full Comparison' },
+  { id: 'recommendation', label: 'Our Suggestion' },
+];
+
+function fmt(v) { return '$' + Math.round(v).toLocaleString(); }
+function fmtS(v) {
+  if (Math.abs(v) >= 1e6) return '$' + (v/1e6).toFixed(2) + 'M';
+  if (Math.abs(v) >= 1000) return '$' + Math.round(v/1000) + 'K';
+  return '$' + Math.round(v).toLocaleString();
+}
+
+function calc() {
+  const rm = [], loc = [], lt = [], ds = [];
+  // RM
+  let rmB = 0, rmD = 0;
+  for (let y = 1; y <= yrs; y++) {
+    const hv = HV * Math.pow(1 + hg/100, y);
+    const can = Math.max(0, HV * 0.3 - rmB);
+    const draw = Math.min(AN, can);
+    let b = rmB + draw;
+    for (let m = 0; m < 12; m++) b *= (1 + rmR/100/12);
+    rmB = b; rmD += draw;
+    rm.push({ y, ages: `${MA+y} / ${SA+y}`, cash: draw, total: rmD, debt: rmB, hv, eq: Math.max(0, hv - rmB), hit: draw < AN, extra: draw < AN ? '⚠ NO MORE CASH' : 'Interest: ' + fmt(rmB - rmD) });
+  }
+  // LOC
+  let lB = 8000, lD = 0;
+  for (let y = 1; y <= yrs; y++) {
+    const hv = HV * Math.pow(1 + hg/100, y);
+    lB += AN; let b = lB;
+    for (let m = 0; m < 12; m++) b *= (1 + locR/100/12);
+    lB = b; lD += AN;
+    loc.push({ y, ages: `${MA+y} / ${SA+y}`, cash: AN, total: lD, debt: lB, hv, eq: hv - lB, extra: 'Interest: ' + fmt(lB - lD - 8000) });
+  }
+  // LT
+  let ltT = 0;
+  const na = HV*0.025 - HV*0.0023, fy = na - HV*0.002;
+  for (let y = 1; y <= yrs; y++) {
+    const hv = HV * Math.pow(1 + hg/100, y);
+    const inc = y === 1 ? fy : y <= 10 ? na : 0;
+    ltT += inc;
+    const op = y <= 10 ? Math.max(0.65, 1 - 0.035*y) : 0.65;
+    const lp = y <= 10 ? Math.min(0.35, 0.035*y) : 0.35;
+    lt.push({ y, ages: `${MA+y} / ${SA+y}`, cash: inc, total: ltT, debt: hv*lp, hv, eq: hv*op, extra: y <= 10 ? 'You own ' + Math.round(op*100) + '%' : 'Own 65% — payments stopped' });
+  }
+  // DS
+  let pool = 365000, dsD = 0;
+  for (let y = 1; y <= yrs; y++) {
+    pool = pool * 1.035 - AN; dsD += AN;
+    const nhv = 600000 * Math.pow(1 + hg/100, y);
+    ds.push({ y, ages: `${MA+y} / ${SA+y}`, cash: AN, total: dsD, debt: 0, hv: nhv, eq: nhv + Math.max(0, pool), pool, extra: pool > 0 ? 'Savings: ' + fmt(pool) : '⚠ SAVINGS GONE' });
+  }
+  return { rm, loc, lt, ds };
+}
+
+function makeTable(data, color, showExtra) {
+  let h = `<div class="tbl-wrap"><table><thead><tr style="background:${color}10">`;
+  const cols = ['Year','Your Ages','Money You Get (Yr)','Total Received','What You Owe / Give Up','Home Value','Your Equity Left'];
+  if (showExtra) cols.push('Notes');
+  cols.forEach((c,i) => { h += `<th style="border-bottom:2px solid ${color}30;${i>1?'text-align:right':''}">${c}</th>`; });
+  h += '</tr></thead><tbody>';
+  data.forEach(r => {
+    const eqCol = r.eq < 200000 ? '#dc2626' : r.eq < 500000 ? '#ca8a04' : '#1e40af';
+    const cashCol = r.cash > 0 ? '#16a34a' : '#94a3b8';
+    h += `<tr><td style="font-weight:600">${r.y}</td><td style="color:#666">${r.ages}</td>`;
+    h += `<td style="color:${cashCol};font-weight:500">${fmt(r.cash)}</td>`;
+    h += `<td style="color:#16a34a;font-weight:600">${fmt(r.total)}</td>`;
+    h += `<td style="color:#dc2626;font-weight:500">${fmt(r.debt)}</td>`;
+    h += `<td>${fmt(r.hv)}</td>`;
+    h += `<td style="font-weight:700;color:${eqCol}">${fmt(r.eq)}</td>`;
+    if (showExtra) h += `<td style="color:#64748b;font-size:12px">${r.extra||''}</td>`;
+    h += '</tr>';
+  });
+  h += '</tbody></table></div>';
+  return h;
+}
+
+function render() {
+  const s = calc();
+  const rl = s.rm[yrs-1], ll = s.loc[yrs-1], tl = s.lt[yrs-1], dl = s.ds[yrs-1];
+  const rmGap = s.rm.find(r=>r.hit);
+  const dsGap = s.ds.find(r=>r.pool<0);
+
+  const sums = [
+    { label:'Reverse Mortgage', icon:'🏦', color:'#dc2626', cash:rl.total, eq:rl.eq, debt:rl.debt, int:rl.debt-rl.total, gap:rmGap?rmGap.y:null, eqPct: rl.hv?(rl.eq/rl.hv*100):0 },
+    { label:'Trust + Line of Credit', icon:'📋', color:'#2563eb', cash:ll.total, eq:ll.eq, debt:ll.debt, int:ll.debt-ll.total-8000, gap:null, eqPct: ll.hv?(ll.eq/ll.hv*100):0 },
+    { label:'Lifetime Home', icon:'🏠', color:'#7c3aed', cash:tl.total, eq:tl.eq, debt:tl.debt, int:0, gap:yrs>10?10:null, eqPct:65 },
+    { label:'Downsize', icon:'🔄', color:'#059669', cash:dl.total, eq:dl.eq, debt:0, int:0, gap:dsGap?dsGap.y:null, eqPct:100 },
+  ];
+
+  // OVERVIEW
+  let ov = `<div class="warn"><strong>Please note:</strong> This tool gives you estimates to help you compare options. The actual numbers will depend on interest rates and house prices over time. Before making any decision, please get advice from an independent financial adviser and lawyer.</div>`;
+  ov += `<h2 style="font-size:20px;font-weight:700;color:#1e293b;margin-bottom:6px">Your Four Options at a Glance</h2>`;
+  ov += `<p style="font-size:14px;color:#64748b;margin-bottom:16px">After ${yrs} years, here's what each option looks like for you:</p>`;
+  ov += '<div class="summary-grid">';
+  sums.forEach(s => {
+    const eqC = s.eq < 200000 ? '#dc2626' : s.eq < 500000 ? '#ca8a04' : '#1e40af';
+    const intStr = s.int > 0 ? fmtS(s.int) : s.label==='Lifetime Home' ? '~'+fmtS(s.debt-s.cash)+' (built into deal)' : '$0';
+    const intC = s.int > 50000 ? '#dc2626' : '#64748b';
+    ov += `<div class="summary-card" style="border-top:4px solid ${s.color}">
+      <div class="summary-label" style="color:${s.color}">${s.icon} ${s.label}</div>
+      <div class="summary-metric">Money you receive over ${yrs} years</div>
+      <div class="summary-value" style="color:#16a34a">${fmtS(s.cash)}</div>
+      <div class="summary-metric" style="margin-top:10px">Interest / premium you pay</div>
+      <div class="summary-value-sm" style="color:${intC}">${intStr}</div>
+      <div class="summary-metric" style="margin-top:10px">Equity you keep in your home</div>
+      <div class="summary-value" style="color:${eqC}">${fmtS(s.eq)}</div>
+      <div style="font-size:11px;color:#94a3b8">(${Math.round(s.eqPct)}% of your home's value)</div>
+      <div class="summary-footer" style="color:${s.gap?'#dc2626':'#16a34a'}">${s.gap ? '⚠ Money runs out at Year '+s.gap : '✓ Funded for the full period'}</div>
+    </div>`;
+  });
+  ov += '</div>';
+  ov += `<div class="card"><div class="card-head"><div class="card-icon" style="background:#47556915">📖</div><div class="card-title" style="color:#475569">What Do These Numbers Mean?</div></div>
+    <div class="content-text">
+    <p><span style="color:#16a34a;font-weight:600">Green numbers</span> = money coming to you. <span style="color:#dc2626;font-weight:600">Red numbers</span> = what it costs you. <span style="color:#1e40af;font-weight:600">Blue numbers</span> = the value still yours.</p>
+    <p><strong>Why "equity left" matters:</strong> This is your safety net. If you need to move to a care home, or need extra money for medical costs — the equity in your home pays for that. The more equity you keep, the more choices you have later.</p>
+    <p>Use the sliders above to see what happens if interest rates change or house prices go up or down.</p>
+    </div></div>`;
+  document.getElementById('tab-overview').innerHTML = ov;
+
+  // OPTION 1
+  let o1 = `<div class="card" style="border:2px solid #dc262620"><div class="card-head"><div class="card-icon" style="background:#dc262615">🏦</div><div class="card-title" style="color:#dc2626">Option 1: Reverse Mortgage (Heartland Bank)</div></div>
+    <div class="content-text">
+    <div class="info-box info-green"><strong>In plain English:</strong> The bank lends you money using your home as security. You don't make any repayments — instead, the interest gets added to what you owe. When you eventually sell the home, the loan gets paid back from the sale.</div>
+    <div class="info-box info-red">
+      <p style="font-weight:700;color:#991b1b;margin-bottom:6px">The Interest Rate</p>
+      <p>• Heartland's rate today: 7.75% — but this <strong>changes over time</strong></p>
+      <p>• Independent reviews say rates are typically <strong>9% to 9.5%</strong> and could go higher</p>
+      <p>• Interest is added to your loan <strong>every month</strong> — then you pay interest on that interest too</p>
+      <p>• We've set the slider to <strong>${rmR}%</strong> as a realistic average over ${yrs} years</p>
+    </div>
+    <p><strong>How much can you borrow?</strong> At age 75, the maximum is 30% of your home = <strong>$300,000</strong>.</p>
+    <p><strong>Your protections:</strong> You can never owe more than the home is worth. You can stay in your home for life. You can repay early with no penalty.</p>
+    <p style="color:#dc2626;font-weight:600">⚠ At ${rmR}%, after ${yrs} years you'd owe ${fmt(rl.debt)} — but you only received ${fmt(rl.total)}. The difference of ${fmt(rl.debt - rl.total)} is pure interest.</p>
+    </div></div>`;
+  o1 += makeTable(s.rm, '#dc2626', true);
+  if (rmGap) o1 += `<div class="info-box info-red" style="margin-top:12px">⚠ <strong>You reach the $300,000 borrowing limit in Year ${rmGap.y}.</strong> After that, no more money comes in — but the interest keeps growing. You'd need another way to get the $25,000/year.</div>`;
+  document.getElementById('tab-option1').innerHTML = o1;
+
+  // OPTION 2
+  let o2 = `<div class="card" style="border:2px solid #2563eb20"><div class="card-head"><div class="card-icon" style="background:#2563eb15">📋</div><div class="card-title" style="color:#2563eb">Option 2: Family Trust + Line of Credit</div></div>
+    <div class="content-text">
+    <div class="info-box info-green"><strong>In plain English:</strong> Your home gets transferred into a family trust. The trust takes out a normal bank loan against the home. You draw $25,000/year. The interest rate is much lower than a reverse mortgage.</div>
+    <p><strong>Interest rate:</strong> ~${locR}% — about half the cost of a reverse mortgage</p>
+    <p><strong>How much can you borrow?</strong> Up to $600-700K — much more room</p>
+    <p><strong>Setup cost:</strong> About $8,000 for lawyers, trust setup, and transfer</p>
+    <p style="font-weight:700;color:#dc2626;margin-top:12px">⚠ Why this is complicated:</p>
+    <p>• <strong>The bank may say no:</strong> At your ages with pension income only, getting approved is very difficult. A family member would likely need to go on the loan too.</p>
+    <p>• <strong>Family dynamics:</strong> With five children from two families, putting one child on the trust/loan could cause disagreements.</p>
+    <p>• <strong>Rest home subsidy:</strong> Transferring your home to a trust may count against you if you later need a rest home subsidy. There's a 5-year lookback rule.</p>
+    <p>• <strong>It's complex:</strong> Trusts have ongoing legal and tax obligations.</p>
+    </div></div>`;
+  o2 += makeTable(s.loc, '#2563eb', true);
+  document.getElementById('tab-option2').innerHTML = o2;
+
+  // OPTION 3
+  let o3 = `<div class="card" style="border:2px solid #7c3aed20"><div class="card-head"><div class="card-icon" style="background:#7c3aed15">🏠</div><div class="card-title" style="color:#7c3aed">Option 3: Lifetime Home (Debt-Free Equity Release)</div></div>
+    <div class="content-text">
+    <div class="info-box info-green"><strong>In plain English:</strong> A company called Lifetime buys a share of your home (35% over 10 years). In return, they pay you a regular income for 10 years. There is <strong>no loan, no debt, and no interest</strong>. You keep living in your home, and you still own 65%.</div>
+    <p><strong>What you receive:</strong> About $22,700 per year ($873 every fortnight) for 10 years. Paid on the same day as your NZ Super. Tax-free.</p>
+    <p><strong>What it costs:</strong> Small setup fee ($2,000) plus $2,300/year in fees. After year 10: $1,000/year.</p>
+    <p><strong>What Lifetime gets:</strong> 35% of your home. When the home is eventually sold, they get 35% and you get 65%.</p>
+    <p><strong>The trade-off:</strong> You're selling 35% but only receiving 25% as income. The ~$100,000 difference is the fee for this being debt-free.</p>
+    <p style="font-weight:700;color:#7c3aed;margin-top:12px">Things to know:</p>
+    <p>• <strong>Payments stop after 10 years.</strong> If you're still at home, you'd need another source.</p>
+    <p>• <strong>You must be 70+ and own outright.</strong> You qualify.</p>
+    <p>• <strong>The income doesn't increase with inflation.</strong></p>
+    <p>• <strong>Smaller options available:</strong> You can sell 20%, 25% or 30% for less income.</p>
+    <p>• <strong>Simple and clean:</strong> No family member needs to be involved.</p>
+    </div></div>`;
+  o3 += makeTable(s.lt, '#7c3aed', true);
+  if (yrs > 10) o3 += `<div class="info-box info-purple" style="margin-top:12px;font-size:14px"><strong>After Year 10:</strong> Income payments stop, but you can still live in your home and you still own 65%. If you need money, options include the family helping out, a small reverse mortgage on the remaining equity, or selling the home if you move to care.</div>`;
+  document.getElementById('tab-option3').innerHTML = o3;
+
+  // OPTION 4
+  let o4 = `<div class="card" style="border:2px solid #05966920"><div class="card-head"><div class="card-icon" style="background:#05966915">🔄</div><div class="card-title" style="color:#059669">Option 4: Sell and Move Somewhere Smaller</div></div>
+    <div class="content-text">
+    <div class="info-box info-green"><strong>In plain English:</strong> Sell your current home for $1,000,000, buy a smaller place for about $600,000 (like a tidy unit in Orewa or Silverdale), and put the leftover money (~$365,000) in the bank. Draw $25,000/year.</div>
+    <p><strong>No debt. No interest. No other company involved.</strong></p>
+    <p><strong>Savings earn about 3.5%</strong> in a term deposit.</p>
+    <p style="font-weight:700;color:#059669;margin-top:12px">The good:</p>
+    <p>• You own everything outright</p>
+    <p>• Smaller home = lower rates, insurance, maintenance</p>
+    <p>• Could be closer to shops, doctors, transport</p>
+    <p style="font-weight:700;color:#dc2626;margin-top:12px">The hard part:</p>
+    <p>• <strong>You have to leave your home.</strong> We know this is a big thing.</p>
+    <p>• Moving at your stage of life is tough</p>
+    <p>• The savings pool gradually runs down</p>
+    </div></div>`;
+  o4 += makeTable(s.ds, '#059669', true);
+  document.getElementById('tab-option4').innerHTML = o4;
+
+  // COMPARISON
+  const cmpRows = [
+    { l:'Interest rate charged', v:[`${rmR}% (changes!)`, `${locR}%`, 'None — no loan', 'None'], c:['#dc2626','#2563eb','#16a34a','#16a34a'] },
+    { l:'Total money you receive', v:[fmt(rl.total),fmt(ll.total),fmt(tl.total),fmt(dl.total)], c:['#16a34a','#16a34a','#16a34a','#16a34a'] },
+    { l:'Total interest cost', v:[rl.debt-rl.total>0?fmt(rl.debt-rl.total):'$0', ll.debt-ll.total-8000>0?fmt(ll.debt-ll.total-8000):'$0', '$0','$0'], c:[rl.debt-rl.total>100000?'#dc2626':'#64748b', ll.debt-ll.total>100000?'#dc2626':'#64748b','#64748b','#64748b'] },
+    { l:'YOUR EQUITY LEFT', v:[fmt(rl.eq),fmt(ll.eq),fmt(tl.eq),fmt(dl.eq)], c:[rl.eq<200000?'#dc2626':'#1e40af', '#1e40af','#1e40af','#1e40af'], hl:true },
+    { l:'% of home you still own', v:[Math.round(rl.hv?(rl.eq/rl.hv*100):0)+'%', Math.round(ll.hv?(ll.eq/ll.hv*100):0)+'%','65%','100%'], c:['#475569','#475569','#475569','#475569'], hl:true },
+    { l:'When does the money stop?', v:[rmGap?'Year '+rmGap.y:'Continues','Continues',yrs>10?'Year 10':'Continues',dsGap?'Year '+dsGap.y:'Continues'], c:[rmGap?'#dc2626':'#16a34a','#16a34a',yrs>10?'#ca8a04':'#16a34a',dsGap?'#dc2626':'#16a34a'] },
+    { l:'Do you stay in your home?', v:['Yes ✓','Yes ✓','Yes ✓','No — you move'], c:['#16a34a','#16a34a','#16a34a','#dc2626'] },
+    { l:'How complicated is it?', v:['Simple','Very complex','Simple','Some effort'], c:['#16a34a','#dc2626','#16a34a','#ca8a04'] },
+    { l:'Risk to interest rates?', v:['Very high','Medium','None','None'], c:['#dc2626','#ca8a04','#16a34a','#16a34a'] },
+    { l:'Family involvement needed?', v:['No','Yes — complex','No','Discussed'], c:['#16a34a','#dc2626','#16a34a','#ca8a04'] },
+    { l:'Rest home subsidy risk?', v:['Low','High risk','Unknown (new)','Low'], c:['#16a34a','#dc2626','#ca8a04','#16a34a'] },
+  ];
+  let cmp = `<h2 style="font-size:20px;font-weight:700;color:#1e293b;margin-bottom:16px">All Four Options Side by Side — Year ${yrs}</h2>`;
+  cmp += '<div class="tbl-wrap"><table class="cmp-table"><thead><tr style="background:#f1f5f9"><th style="text-align:left"></th><th style="color:#dc2626">🏦 Reverse Mortgage</th><th style="color:#2563eb">📋 Trust + LOC</th><th style="color:#7c3aed">🏠 Lifetime Home</th><th style="color:#059669">🔄 Downsize</th></tr></thead><tbody>';
+  cmpRows.forEach(r => {
+    const bg = r.hl ? 'background:#eff6ff;' : '';
+    const fw = r.hl ? 'font-weight:800;font-size:15px;' : 'font-weight:600;';
+    cmp += `<tr style="border-bottom:1px solid #f1f5f9;${bg}"><td style="text-align:left;${fw}color:#334155;padding:9px 12px">${r.l}</td>`;
+    for (let i = 0; i < 4; i++) cmp += `<td style="${fw}color:${r.c[i]};padding:9px 12px">${r.v[i]}</td>`;
+    cmp += '</tr>';
+  });
+  cmp += '</tbody></table></div>';
+
+  // Bars
+  const maxEq = Math.max(...sums.map(x=>x.eq), 1);
+  cmp += `<h3 style="font-size:16px;font-weight:700;color:#1e293b;margin-top:28px;margin-bottom:12px">Your Equity at Year ${yrs}</h3><div class="bar-wrap">`;
+  sums.forEach(s => {
+    const pct = Math.max(0, s.eq / maxEq * 100);
+    cmp += `<div><div class="bar-label" style="color:${s.color}">${s.icon} ${s.label}</div><div class="bar-bg"><div class="bar-fill" style="background:${s.color};width:${pct}%;min-width:${pct>5?'90px':'0'}">${fmtS(s.eq)}</div></div></div>`;
+  });
+  cmp += '</div>';
+  document.getElementById('tab-compare').innerHTML = cmp;
+
+  // RECOMMENDATION
+  let rec = `<div class="card" style="border:2px solid #1e3a5f20"><div class="card-head"><div class="card-icon" style="background:#1e3a5f15">💡</div><div class="card-title" style="color:#1e3a5f">What We'd Suggest Looking At First</div></div>
+    <div class="content-text" style="line-height:1.8">
+    <div class="info-box info-green" style="font-size:16px"><strong>Lifetime Home looks like the strongest option for your situation</strong></div>
+    <p style="font-size:15px;font-weight:600;color:#1e293b;margin-bottom:14px">Here's why, in simple terms:</p>
+    <p><strong>It gives you what you need.</strong> You need about $25,000/year. Lifetime Home pays about $22,700/year for 10 years. That's $873 in your account every fortnight, same day as NZ Super.</p>
+    <p><strong>There's no debt hanging over you.</strong> Unlike the reverse mortgage where at ${rmR}% you'd owe ${fmt(rl.debt)} after ${yrs} years, with Lifetime Home there is no loan, no interest, no growing debt.</p>
+    <p><strong>You keep most of your home.</strong> After 10 years, you still own 65%. With the reverse mortgage, you'd only have ${fmt(rl.eq)} left — much less security.</p>
+    <p><strong>It's simple.</strong> No trust, no bank approval, no family member on a mortgage.</p>
+    <p><strong>After Year 10:</strong> Payments stop but you stay in your home. By then you'll be 85 and 90. The family could help, or you could take a small reverse mortgage on remaining equity, or you may be moving to care.</p>
+
+    <div class="info-box info-red" style="margin-top:16px">
+      <p style="font-weight:700;margin-bottom:8px">Why NOT the Reverse Mortgage?</p>
+      <p>At ${rmR}%, after ${yrs} years you'd have received ${fmt(rl.total)} but would owe ${fmt(rl.debt)}. That's ${fmt(rl.debt - rl.total)} eaten by interest. The rate can go up — it's been as high as 9.5%+. This leaves you with the least equity for your future.</p>
+    </div>
+
+    <div class="info-box info-blue next-steps" style="margin-top:16px">
+      <p style="font-weight:700;margin-bottom:8px">What To Do Next:</p>
+      <p><strong>1. Call Lifetime for a free info pack:</strong> 0800 254 338 — no commitment.</p>
+      <p><strong>2. Also call Heartland for a quote:</strong> 0800 488 740 — so you can compare.</p>
+      <p><strong>3. See a financial adviser:</strong> Independent advice. Budget $500-$1,000.</p>
+      <p><strong>4. See a lawyer:</strong> Especially about rest home subsidy impacts.</p>
+      <p><strong>5. Take your time.</strong> There's no rush. Talk it through as a family.</p>
+    </div>
+
+    <div class="info-box info-yellow" style="margin-top:16px">
+      <p style="font-weight:700;margin-bottom:8px">About Rest Home Care</p>
+      <p>If either of you needs rest home care, it costs $75,000–$122,000/year. The government can help but only if assets are below certain limits. Any decision about your home now could affect whether you qualify later. <strong>Talk to a lawyer before choosing any option.</strong></p>
+    </div>
+    </div></div>`;
+  document.getElementById('tab-recommendation').innerHTML = rec;
+}
+
+function buildTabs() {
+  const c = document.getElementById('tabs');
+  c.innerHTML = '';
+  tabDefs.forEach(t => {
+    const btn = document.createElement('button');
+    btn.className = 'tab' + (t.id === activeTab ? ' active' : '');
+    btn.textContent = t.label;
+    btn.onclick = () => { activeTab = t.id; showTab(); };
+    c.appendChild(btn);
+  });
+}
+
+function showTab() {
+  document.querySelectorAll('.tab').forEach((b,i) => b.className = 'tab' + (tabDefs[i].id === activeTab ? ' active' : ''));
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + activeTab).classList.add('active');
+}
+
+function update() {
+  hg = +document.getElementById('sl-hg').value;
+  rmR = +document.getElementById('sl-rm').value;
+  locR = +document.getElementById('sl-loc').value;
+  yrs = +document.getElementById('sl-yr').value;
+  document.getElementById('lbl-hg').textContent = hg + '%';
+  document.getElementById('lbl-rm').textContent = rmR + '%';
+  document.getElementById('lbl-loc').textContent = locR + '%';
+  document.getElementById('lbl-yr').textContent = yrs;
+  document.querySelector('.header p').innerHTML = `35 Cambie Ave, Red Beach — Home Value: $1,000,000<br>This tool helps you compare four ways to get the extra $25,000/year you need,<br>while keeping as much of your home's value as possible for your future security.`;
+  render();
+}
+
+document.getElementById('sl-hg').oninput = update;
+document.getElementById('sl-rm').oninput = update;
+document.getElementById('sl-loc').oninput = update;
+document.getElementById('sl-yr').oninput = update;
+
+buildTabs();
+render();
+</script>
+</body>
+</html>
