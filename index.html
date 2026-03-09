@@ -119,6 +119,7 @@ p{margin-bottom:8px}
   <div id="tab-option3" class="tab-content"></div>
   <div id="tab-compare" class="tab-content"></div>
   <div id="tab-recommendation" class="tab-content"></div>
+  <div id="tab-actuals" class="tab-content"></div>
   <div id="tab-budget" class="tab-content"></div>
   <div class="footer">This is a modelling tool — not financial advice. All numbers are estimates. Please get independent professional advice before making any decisions.</div>
 </div>
@@ -128,6 +129,7 @@ let AN=25000,hg=2.5,rmR=9,locR=5.5,yrs=13,activeTab='overview';
 const tabDefs=[
   {id:'overview',label:'Summary'},{id:'option1',label:'1. Reverse Mortgage'},{id:'option2',label:'2. Trust + LOC'},
   {id:'option3',label:'3. Lifetime Home'},{id:'compare',label:'Full Comparison'},{id:'recommendation',label:'Our Suggestion'},
+  {id:'actuals',label:'📊 Actuals'},
   {id:'budget',label:'💰 Budget'}
 ];
 function fmt(v){return '$'+Math.round(v).toLocaleString()}
@@ -136,15 +138,16 @@ function fmtDraw(v){return '$'+Math.round(v).toLocaleString()}
 
 // === BUDGET STORAGE ===
 const defaultBudget={
-  pension_weekly:828, savings:82000,
-  rates:3596, home_contents_insurance:1500,
-  power:4800, water:1200, internet_phone:1200,
-  food:15600, medical:5200, clothing:1200,
-  car1_fuel:1200, car1_insurance:700, car1_rego:300, car1_maintenance:800,
-  car2_fuel:1200, car2_insurance:700, car2_rego:300, car2_maintenance:800,
-  entertainment:10400, gifts:500, home_maintenance:2000, other:0
+  pension_weekly:828, savings:86000,
+  rates:3596, home_contents_insurance:3378,
+  power:3012, water:1387, internet_phone:1740,
+  food:15781, medical:8360, clothing:5822,
+  car1_fuel:2048, car1_insurance:0, car1_rego:150, car1_maintenance:679,
+  car2_fuel:2048, car2_insurance:0, car2_rego:150, car2_maintenance:679,
+  entertainment:10947, gifts:500, home_maintenance:2000, other:7272,
+  rubbish:376, subscriptions:330, aa_membership:328
 };
-function loadBudget(){try{const s=localStorage.getItem('equityToolBudget');return s?JSON.parse(s):Object.assign({},defaultBudget)}catch(e){return Object.assign({},defaultBudget)}}
+function loadBudget(){try{const s=localStorage.getItem('equityToolBudget');if(s){const saved=JSON.parse(s);return Object.assign({},defaultBudget,saved)}return Object.assign({},defaultBudget)}catch(e){return Object.assign({},defaultBudget)}}
 function saveBudget(b){try{localStorage.setItem('equityToolBudget',JSON.stringify(b))}catch(e){}}
 let budget=loadBudget();
 
@@ -409,6 +412,8 @@ function render(){
 
   // === BUDGET TAB ===
   renderBudget();
+  // === ACTUALS TAB ===
+  renderActuals();
 }
 
 function renderBudget(){
@@ -418,39 +423,39 @@ function renderBudget(){
   const expenses=[
     {section:'Housing'},
     {k:'rates',label:'Council Rates',v:b.rates},
-    {k:'home_contents_insurance',label:'Home & Contents Insurance',v:b.home_contents_insurance},
+    {k:'home_contents_insurance',label:'Insurance (Home, Contents & 2 Cars — AA)',v:b.home_contents_insurance},
     {k:'home_maintenance',label:'Home Maintenance',v:b.home_maintenance},
     {section:'Utilities'},
     {k:'power',label:'Power / Gas',v:b.power},
     {k:'water',label:'Water',v:b.water},
     {k:'internet_phone',label:'Internet & Phone',v:b.internet_phone},
+    {k:'rubbish',label:'Rubbish Collection',v:b.rubbish||0},
     {section:'Living'},
     {k:'food',label:'Food & Groceries',v:b.food},
-    {k:'clothing',label:'Clothing',v:b.clothing},
-    {k:'medical',label:'Medical / Prescriptions',v:b.medical},
-    {k:'entertainment',label:'Fun / Coffees / Entertainment',v:b.entertainment},
+    {k:'clothing',label:'Clothing & Fashion',v:b.clothing},
+    {k:'medical',label:'Medical / Pharmacy / Dental',v:b.medical},
+    {k:'entertainment',label:'Cafes, Dining & Entertainment',v:b.entertainment},
     {k:'gifts',label:'Gifts / Donations',v:b.gifts},
-    {section:'Car 1'},
+    {k:'subscriptions',label:'Subscriptions (Sky Sport etc)',v:b.subscriptions||0},
+    {section:'Cars (2 vehicles)'},
     {k:'car1_fuel',label:'Car 1 — Fuel',v:b.car1_fuel},
-    {k:'car1_insurance',label:'Car 1 — Insurance',v:b.car1_insurance},
     {k:'car1_rego',label:'Car 1 — Registration',v:b.car1_rego},
     {k:'car1_maintenance',label:'Car 1 — Maintenance / WOF',v:b.car1_maintenance},
-    {section:'Car 2'},
     {k:'car2_fuel',label:'Car 2 — Fuel',v:b.car2_fuel},
-    {k:'car2_insurance',label:'Car 2 — Insurance',v:b.car2_insurance},
     {k:'car2_rego',label:'Car 2 — Registration',v:b.car2_rego},
     {k:'car2_maintenance',label:'Car 2 — Maintenance / WOF',v:b.car2_maintenance},
+    {k:'aa_membership',label:'AA Roadservice Membership',v:b.aa_membership||0},
     {section:'Other'},
-    {k:'other',label:'Other Expenses',v:b.other},
+    {k:'other',label:'Hardware / Garden',v:b.other},
   ];
   const totalExpenses=expenses.filter(e=>e.k).reduce((s,e)=>s+e.v,0);
   const surplus=totalIncome-totalExpenses;
   const surplusClass=surplus>=0?'budget-surplus':'budget-surplus budget-deficit';
   const surplusColor=surplus>=0?'#16a34a':'#dc2626';
 
-  let h=`<div class="card"><div class="card-head"><div class="card-icon" style="background:#2563eb15">💰</div><div class="card-title" style="color:#2563eb">Budget Planner</div></div>
+  let h=`<div class="card"><div class="card-head"><div class="card-icon" style="background:#2563eb15">💰</div><div class="card-title" style="color:#2563eb">Budget Planner — Based on Real Spending</div></div>
     <div class="content-text">
-    <p>Edit any column — the other two update automatically. All figures are saved to your device.</p>
+    <p>These figures are pre-filled from your actual bank statements (Mar 2025 – Mar 2026). Edit any column — the other two update automatically.</p>
     <div style="display:flex;gap:8px;margin:12px 0;flex-wrap:wrap">
       <button class="btn btn-green" onclick="saveBudgetFromForm()">💾 Save Budget</button>
       <button class="btn btn-gray" onclick="resetBudget()">↩ Reset to Defaults</button>
@@ -462,7 +467,7 @@ function renderBudget(){
         <div><div style="font-size:12px;color:#64748b">NZ Super (couple)</div><div style="font-size:20px;font-weight:800;color:#16a34a">${fmt(pensionAnnual)}/yr</div><div style="font-size:12px;color:#94a3b8">$${b.pension_weekly}/week</div></div>
         <div><div style="font-size:12px;color:#64748b">Equity Drawdown</div><div style="font-size:20px;font-weight:800;color:#1e40af">${fmtDraw(AN)}/yr</div><div style="font-size:12px;color:#94a3b8">${fmt(Math.round(AN/52))}/week</div></div>
         <div><div style="font-size:12px;color:#64748b">Total Income</div><div style="font-size:20px;font-weight:800;color:#1e293b">${fmt(totalIncome)}/yr</div><div style="font-size:12px;color:#94a3b8">${fmt(Math.round(totalIncome/52))}/week</div></div>
-        <div><div style="font-size:12px;color:#64748b">Savings</div><div style="font-size:20px;font-weight:800;color:#475569">${fmt(b.savings)}</div><div style="font-size:12px;color:#94a3b8">Emergency buffer</div></div>
+        <div><div style="font-size:12px;color:#64748b">Investment Fund</div><div style="font-size:20px;font-weight:800;color:#475569">${fmt(b.savings)}</div><div style="font-size:12px;color:#94a3b8">Depleting — see Actuals tab</div></div>
       </div>
     </div>
 
@@ -493,13 +498,148 @@ function renderBudget(){
   h+='</div></div>';
 
   if(surplus<0){
-    h+=`<div class="info-box info-red" style="margin-top:16px"><strong>You're ${fmt(Math.abs(surplus))}/year short</strong> (${fmt(surpWeekly)}/week). Increase the drawdown slider or reduce expenses. Your ${fmt(b.savings)} savings could cover this for about ${Math.floor(b.savings/Math.abs(surplus))} years.</div>`;
+    h+=`<div class="info-box info-red" style="margin-top:16px"><strong>You're ${fmt(Math.abs(surplus))}/year short</strong> (${fmt(surpWeekly)}/week). Increase the drawdown slider or reduce expenses. Your ${fmt(b.savings)} investment fund could cover this for about ${Math.floor(b.savings/Math.abs(surplus))} years.</div>`;
   } else {
     h+=`<div class="info-box info-green" style="margin-top:16px"><strong>${fmt(surplus)}/year surplus</strong> (${fmt(surpWeekly)}/week). Breathing room for unexpected costs — or reduce the drawdown to preserve more equity.</div>`;
   }
 
   h+='</div>';
   document.getElementById('tab-budget').innerHTML=h;
+}
+
+// === ACTUALS TAB ===
+function renderActuals(){
+  // Real bank statement data: Mar 2025 – Mar 2026
+  const actual={
+    income:{
+      nzSuper:43056,
+      investmentDrawdowns:39000,
+      investmentReturns:6970,
+    },
+    recurring:[
+      {cat:'Food & Groceries',amount:15781,weekly:303,note:'Countdown, Pak\'nSave, New World'},
+      {cat:'Cafes & Dining Out',amount:10947,weekly:211,note:'Eating out, coffees, takeaways'},
+      {cat:'Medical / Pharmacy',amount:8360,weekly:161,note:'Prescriptions, GP visits, podiatry, physio'},
+      {cat:'Hardware & Garden',amount:7272,weekly:140,note:'Mitre 10, Bunnings — both keen gardeners'},
+      {cat:'Clothing & Fashion',amount:5822,weekly:112,note:'Various retail'},
+      {cat:'Fuel (2 cars)',amount:4095,weekly:79,note:'BP, Z, Gull'},
+      {cat:'Insurance (AA — all policies)',amount:3378,weekly:65,note:'Home, contents & 2 cars combined'},
+      {cat:'Council Rates',amount:3596,weekly:69,note:'Auckland Council — confirmed exact'},
+      {cat:'Power',amount:3012,weekly:58,note:'Mercury / Genesis'},
+      {cat:'Internet & Phone',amount:1740,weekly:33,note:'Spark / 2degrees'},
+      {cat:'Water',amount:1387,weekly:27,note:'Watercare'},
+      {cat:'Car Servicing (2 cars)',amount:1358,weekly:26,note:'Honda + Toyota annual service'},
+      {cat:'Rubbish Collection',amount:376,weekly:7,note:'Northland Waste'},
+      {cat:'Subscriptions',amount:330,weekly:6,note:'Sky Sport Now'},
+      {cat:'AA Roadservice',amount:328,weekly:6,note:'Annual membership'},
+    ],
+    oneOff:[
+      {cat:'Landscaper',amount:3426,note:'One-off garden/lawn work'},
+      {cat:'Dental (Endodontics)',amount:2620,note:'One-off root canal/specialist'},
+      {cat:'Armstrong Smarter Orewa',amount:945,note:'Unknown — one-off'},
+      {cat:'Airbnb / Holiday',amount:571,note:'Holiday accommodation'},
+    ],
+  };
+
+  const totalRecurring=actual.recurring.reduce((s,r)=>s+r.amount,0);
+  const totalOneOff=actual.oneOff.reduce((s,r)=>s+r.amount,0);
+  const totalSpend=totalRecurring+totalOneOff;
+  const totalCashIn=actual.income.nzSuper+actual.income.investmentDrawdowns;
+  const deficit=totalSpend-actual.income.nzSuper;
+  const fundBurnYears=(86000/deficit).toFixed(1);
+  const futureGap=totalRecurring-actual.income.nzSuper;
+
+  let h=`<div class="card"><div class="card-head"><div class="card-icon" style="background:#f5920015">📊</div><div class="card-title" style="color:#b45309">Actual Spending — Bank Statement Analysis</div></div>
+  <div class="content-text"><p>Based on all bank accounts, Visa card, and investment fund transactions from <strong>March 2025 to March 2026</strong>.</p></div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin:20px 0">
+    <div style="background:#f0fdf4;border-radius:12px;padding:16px;border:1px solid #86efac">
+      <div style="font-size:12px;color:#64748b">NZ Super Income</div>
+      <div style="font-size:22px;font-weight:800;color:#16a34a">${fmt(actual.income.nzSuper)}/yr</div>
+      <div style="font-size:12px;color:#94a3b8">$828/week</div>
+    </div>
+    <div style="background:#eff6ff;border-radius:12px;padding:16px;border:1px solid #93c5fd">
+      <div style="font-size:12px;color:#64748b">Investment Fund Drawn</div>
+      <div style="font-size:22px;font-weight:800;color:#2563eb">${fmt(actual.income.investmentDrawdowns)}/yr</div>
+      <div style="font-size:12px;color:#94a3b8">$1K fortnightly + 3×$5K extras</div>
+    </div>
+    <div style="background:#fef2f2;border-radius:12px;padding:16px;border:1px solid #fca5a5">
+      <div style="font-size:12px;color:#64748b">Total Spent (all accounts)</div>
+      <div style="font-size:22px;font-weight:800;color:#dc2626">${fmt(totalSpend)}/yr</div>
+      <div style="font-size:12px;color:#94a3b8">${fmt(Math.round(totalSpend/52))}/week</div>
+    </div>
+    <div style="background:#fefce8;border-radius:12px;padding:16px;border:1px solid #fde047">
+      <div style="font-size:12px;color:#64748b">Investment Fund Remaining</div>
+      <div style="font-size:22px;font-weight:800;color:#b45309">$86,106</div>
+      <div style="font-size:12px;color:#94a3b8">Was $119,571 a year ago</div>
+    </div>
+  </div>`;
+
+  // Big warning box
+  h+=`<div class="info-box info-red" style="font-size:15px;line-height:1.7">
+    <strong style="font-size:17px">⚠ The Real Picture</strong><br>
+    Spending: <strong>${fmt(totalSpend)}/year</strong> (${fmt(Math.round(totalSpend/52))}/week)<br>
+    Pension income: <strong>${fmt(actual.income.nzSuper)}/year</strong><br>
+    Gap the investment fund is covering: <strong>${fmt(deficit)}/year</strong><br>
+    At this rate, the $86K fund lasts roughly <strong>${fundBurnYears} more years</strong> (with ~6% returns it may stretch to ~2.5 years).<br><br>
+    <strong>When the fund runs out, the equity drawdown needs to cover ${fmt(futureGap)}/year</strong> — not $25K. Move the drawdown slider to <strong>$${Math.ceil(futureGap/1000)*1}K+</strong> to see the real impact.
+  </div>`;
+
+  // Investment fund detail
+  h+=`<div class="card" style="margin-top:20px;border:2px solid #f59e0030">
+    <div style="font-size:15px;font-weight:700;color:#b45309;margin-bottom:12px">📈 Investment Fund (ASB EF209059)</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px">
+      <div><div style="font-size:12px;color:#64748b">Opening (Mar 2025)</div><div style="font-size:18px;font-weight:700">$119,571</div></div>
+      <div><div style="font-size:12px;color:#64748b">Withdrawn</div><div style="font-size:18px;font-weight:700;color:#dc2626">-$39,000</div></div>
+      <div><div style="font-size:12px;color:#64748b">Returns Earned</div><div style="font-size:18px;font-weight:700;color:#16a34a">+$6,970</div></div>
+    </div>
+    <div><div style="font-size:12px;color:#64748b">Balance (Mar 2026)</div><div style="font-size:22px;font-weight:800;color:#b45309">$86,106</div></div>
+    <div style="font-size:13px;color:#64748b;margin-top:12px">Drawing $1,000 fortnightly plus three additional $5,000 withdrawals (Sep, Nov, Dec 2025) when extra cash needed for credit cards and one-off expenses.</div>
+  </div>`;
+
+  // Recurring spend table
+  h+=`<div class="card" style="margin-top:20px"><div style="font-size:15px;font-weight:700;color:#334155;margin-bottom:12px">Recurring Annual Spending — ${fmt(totalRecurring)}/year (${fmt(Math.round(totalRecurring/52))}/week)</div>
+  <div class="tbl-wrap"><table>
+    <thead><tr style="background:#f1f5f9"><th style="text-align:left">Category</th><th>Annual</th><th>Weekly</th><th style="text-align:left">Notes</th></tr></thead><tbody>`;
+  actual.recurring.sort((a,b)=>b.amount-a.amount).forEach((r,i)=>{
+    const bg=i%2===0?'':'background:#f9fafb';
+    const barW=Math.round(r.amount/actual.recurring[0].amount*100);
+    h+=`<tr style="${bg}"><td style="text-align:left;font-weight:600">${r.cat}</td>
+      <td style="font-weight:700">${fmt(r.amount)}<div style="background:#e2e8f0;border-radius:4px;height:4px;margin-top:3px"><div style="background:#2563eb;height:4px;border-radius:4px;width:${barW}%"></div></div></td>
+      <td>${fmt(r.weekly)}</td>
+      <td style="text-align:left;font-size:12px;color:#64748b">${r.note}</td></tr>`;
+  });
+  h+=`<tr style="border-top:2px solid #1e3a5f;font-weight:800"><td style="text-align:left">TOTAL RECURRING</td><td>${fmt(totalRecurring)}</td><td>${fmt(Math.round(totalRecurring/52))}</td><td></td></tr>`;
+  h+=`</tbody></table></div></div>`;
+
+  // One-off spend
+  h+=`<div class="card" style="margin-top:20px"><div style="font-size:15px;font-weight:700;color:#334155;margin-bottom:12px">One-Off Expenses — ${fmt(totalOneOff)} (not expected to repeat annually)</div>
+  <div class="tbl-wrap"><table>
+    <thead><tr style="background:#fefce8"><th style="text-align:left">Item</th><th>Amount</th><th style="text-align:left">Notes</th></tr></thead><tbody>`;
+  actual.oneOff.forEach((r,i)=>{
+    h+=`<tr style="${i%2?'background:#f9fafb':''}"><td style="text-align:left;font-weight:600">${r.cat}</td><td style="font-weight:700">${fmt(r.amount)}</td><td style="text-align:left;font-size:12px;color:#64748b">${r.note}</td></tr>`;
+  });
+  h+=`</tbody></table></div></div>`;
+
+  // The big comparison: what they need vs what they'll have
+  h+=`<div class="card" style="margin-top:20px;border:2px solid #dc262630">
+    <div style="font-size:15px;font-weight:700;color:#dc2626;margin-bottom:16px">🔍 The Gap — What You Spend vs What You'll Have</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr style="background:#fef2f2"><th style="text-align:left">Scenario</th><th>Annual</th><th>Weekly</th><th style="text-align:left">Result</th></tr></thead>
+      <tbody>
+        <tr><td style="text-align:left;font-weight:600">Current spending (recurring)</td><td style="font-weight:700">${fmt(totalRecurring)}</td><td>${fmt(Math.round(totalRecurring/52))}</td><td style="text-align:left;color:#64748b">What you actually spent</td></tr>
+        <tr style="background:#f9fafb"><td style="text-align:left;font-weight:600">Pension only</td><td style="font-weight:700;color:#16a34a">${fmt(actual.income.nzSuper)}</td><td>${fmt(Math.round(actual.income.nzSuper/52))}</td><td style="text-align:left;color:#dc2626;font-weight:600">Short ${fmt(futureGap)}/yr</td></tr>
+        <tr><td style="text-align:left;font-weight:600">Pension + $25K drawdown</td><td style="font-weight:700;color:#2563eb">${fmt(actual.income.nzSuper+25000)}</td><td>${fmt(Math.round((actual.income.nzSuper+25000)/52))}</td><td style="text-align:left;color:${totalRecurring>(actual.income.nzSuper+25000)?'#dc2626':'#16a34a'};font-weight:600">${totalRecurring>(actual.income.nzSuper+25000)?'Short '+fmt(totalRecurring-actual.income.nzSuper-25000)+'/yr':'Surplus '+fmt(actual.income.nzSuper+25000-totalRecurring)+'/yr'}</td></tr>
+        <tr style="background:#f9fafb"><td style="text-align:left;font-weight:600">Pension + $35K drawdown</td><td style="font-weight:700;color:#2563eb">${fmt(actual.income.nzSuper+35000)}</td><td>${fmt(Math.round((actual.income.nzSuper+35000)/52))}</td><td style="text-align:left;color:${totalRecurring>(actual.income.nzSuper+35000)?'#dc2626':'#16a34a'};font-weight:600">${totalRecurring>(actual.income.nzSuper+35000)?'Short '+fmt(totalRecurring-actual.income.nzSuper-35000)+'/yr':'Surplus '+fmt(actual.income.nzSuper+35000-totalRecurring)+'/yr'}</td></tr>
+        <tr><td style="text-align:left;font-weight:600">Pension + $45K drawdown</td><td style="font-weight:700;color:#2563eb">${fmt(actual.income.nzSuper+45000)}</td><td>${fmt(Math.round((actual.income.nzSuper+45000)/52))}</td><td style="text-align:left;color:${totalRecurring>(actual.income.nzSuper+45000)?'#dc2626':'#16a34a'};font-weight:600">${totalRecurring>(actual.income.nzSuper+45000)?'Short '+fmt(totalRecurring-actual.income.nzSuper-45000)+'/yr':'Surplus '+fmt(actual.income.nzSuper+45000-totalRecurring)+'/yr'}</td></tr>
+      </tbody>
+    </table></div>
+    <div class="info-box info-yellow" style="margin-top:16px">
+      <strong>The conversation to have:</strong> Either increase the drawdown to ~$45-50K/year (which burns equity much faster — check the Reverse Mortgage tab), or look at where spending can come down. The biggest discretionary items are cafes & dining ($211/wk), hardware & garden ($140/wk), and clothing ($112/wk) — together these are $24K/year. Cutting these by half saves $12K and brings you much closer to a $25K drawdown being enough.
+    </div>
+  </div>`;
+
+  document.getElementById('tab-actuals').innerHTML=h;
 }
 
 function budgetEdited(key, source){
@@ -526,7 +666,7 @@ function budgetEdited(key, source){
 }
 
 function saveBudgetFromForm(){
-  budgetChanged();
+  saveBudget(budget);
   alert('Budget saved! Anyone viewing this page will see the updated figures.');
 }
 
