@@ -60,13 +60,14 @@ p{margin-bottom:8px}
 .next-steps p{margin-bottom:8px;font-size:14px}
 .draw-highlight{background:#dbeafe;border:1px solid #93c5fd;border-radius:8px;padding:4px 10px;display:inline-block;font-weight:700;color:#1e40af}
 /* Budget styles */
-.budget-grid{display:grid;grid-template-columns:1fr 140px;gap:6px 12px;align-items:center;max-width:600px}
-.budget-cat{font-size:14px;font-weight:500;color:#334155;padding:6px 0}
-.budget-input{width:100%;padding:8px 10px;border:1px solid #cbd5e1;border-radius:8px;font-size:14px;text-align:right;font-family:inherit}
+.budget-grid{display:grid;grid-template-columns:1fr 120px 120px 120px;gap:4px 8px;align-items:center}
+.budget-hdr{font-size:11px;font-weight:700;color:#64748b;text-align:center;padding:6px 4px;text-transform:uppercase}
+.budget-cat{font-size:13px;font-weight:500;color:#334155;padding:5px 0}
+.budget-input{width:100%;padding:6px 8px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;text-align:right;font-family:inherit}
 .budget-input:focus{outline:none;border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,0.1)}
-.budget-section{font-size:13px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;padding:12px 0 4px;border-bottom:1px solid #e2e8f0;margin-bottom:4px;grid-column:1/-1}
-.budget-total{font-size:16px;font-weight:800;padding:10px 0;border-top:2px solid #1e3a5f;grid-column:1/-1;display:flex;justify-content:space-between}
-.budget-surplus{font-size:18px;font-weight:800;padding:14px 0;border-top:3px solid #16a34a;grid-column:1/-1;display:flex;justify-content:space-between}
+.budget-section{font-size:12px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px;padding:10px 0 3px;border-bottom:1px solid #e2e8f0;grid-column:1/-1}
+.budget-total{font-size:15px;font-weight:800;padding:10px 0;border-top:2px solid #1e3a5f;grid-column:1/-1;display:flex;justify-content:space-between}
+.budget-surplus{font-size:17px;font-weight:800;padding:12px 0;border-top:3px solid #16a34a;grid-column:1/-1;display:flex;justify-content:space-between}
 .budget-deficit{border-top-color:#dc2626}
 .btn{padding:10px 20px;border:none;border-radius:9px;cursor:pointer;font-size:14px;font-weight:600;transition:all 0.2s}
 .btn-blue{background:#2563eb;color:#fff}
@@ -420,22 +421,22 @@ function renderBudget(){
     {k:'home_contents_insurance',label:'Home & Contents Insurance',v:b.home_contents_insurance},
     {k:'home_maintenance',label:'Home Maintenance',v:b.home_maintenance},
     {section:'Utilities'},
-    {k:'power',label:'Power / Gas ($400/mo)',v:b.power},
-    {k:'water',label:'Water ($100/mo)',v:b.water},
-    {k:'internet_phone',label:'Internet & Phone ($100/mo)',v:b.internet_phone},
+    {k:'power',label:'Power / Gas',v:b.power},
+    {k:'water',label:'Water',v:b.water},
+    {k:'internet_phone',label:'Internet & Phone',v:b.internet_phone},
     {section:'Living'},
-    {k:'food',label:'Food & Groceries ($300/wk)',v:b.food},
+    {k:'food',label:'Food & Groceries',v:b.food},
     {k:'clothing',label:'Clothing',v:b.clothing},
-    {k:'medical',label:'Medical / Prescriptions ($100/wk)',v:b.medical},
-    {k:'entertainment',label:'Fun / Coffees / Entertainment ($200/wk)',v:b.entertainment},
+    {k:'medical',label:'Medical / Prescriptions',v:b.medical},
+    {k:'entertainment',label:'Fun / Coffees / Entertainment',v:b.entertainment},
     {k:'gifts',label:'Gifts / Donations',v:b.gifts},
     {section:'Car 1'},
-    {k:'car1_fuel',label:'Car 1 — Fuel ($100/mo)',v:b.car1_fuel},
+    {k:'car1_fuel',label:'Car 1 — Fuel',v:b.car1_fuel},
     {k:'car1_insurance',label:'Car 1 — Insurance',v:b.car1_insurance},
     {k:'car1_rego',label:'Car 1 — Registration',v:b.car1_rego},
     {k:'car1_maintenance',label:'Car 1 — Maintenance / WOF',v:b.car1_maintenance},
     {section:'Car 2'},
-    {k:'car2_fuel',label:'Car 2 — Fuel ($100/mo)',v:b.car2_fuel},
+    {k:'car2_fuel',label:'Car 2 — Fuel',v:b.car2_fuel},
     {k:'car2_insurance',label:'Car 2 — Insurance',v:b.car2_insurance},
     {k:'car2_rego',label:'Car 2 — Registration',v:b.car2_rego},
     {k:'car2_maintenance',label:'Car 2 — Maintenance / WOF',v:b.car2_maintenance},
@@ -447,9 +448,9 @@ function renderBudget(){
   const surplusClass=surplus>=0?'budget-surplus':'budget-surplus budget-deficit';
   const surplusColor=surplus>=0?'#16a34a':'#dc2626';
 
-  let h=`<div class="card"><div class="card-head"><div class="card-icon" style="background:#2563eb15">💰</div><div class="card-title" style="color:#2563eb">Annual Budget Planner</div></div>
+  let h=`<div class="card"><div class="card-head"><div class="card-icon" style="background:#2563eb15">💰</div><div class="card-title" style="color:#2563eb">Budget Planner</div></div>
     <div class="content-text">
-    <p>Edit any figure below to match your actual costs. Changes are <strong>saved automatically</strong> so anyone viewing this page can update and save their own figures.</p>
+    <p>Edit any column — the other two update automatically. All figures are saved to your device.</p>
     <div style="display:flex;gap:8px;margin:12px 0;flex-wrap:wrap">
       <button class="btn btn-green" onclick="saveBudgetFromForm()">💾 Save Budget</button>
       <button class="btn btn-gray" onclick="resetBudget()">↩ Reset to Defaults</button>
@@ -458,43 +459,69 @@ function renderBudget(){
 
     <div style="background:#eff6ff;border-radius:12px;padding:16px;margin-bottom:20px">
       <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px">
-        <div><div style="font-size:12px;color:#64748b">NZ Super (couple)</div><div style="font-size:20px;font-weight:800;color:#16a34a">${fmt(pensionAnnual)}/yr</div><div style="font-size:12px;color:#94a3b8">$${b.pension_weekly}/week × 52</div></div>
-        <div><div style="font-size:12px;color:#64748b">Equity Drawdown</div><div style="font-size:20px;font-weight:800;color:#1e40af">${fmtDraw(AN)}/yr</div><div style="font-size:12px;color:#94a3b8">From slider above</div></div>
-        <div><div style="font-size:12px;color:#64748b">Total Annual Income</div><div style="font-size:20px;font-weight:800;color:#1e293b">${fmt(totalIncome)}/yr</div><div style="font-size:12px;color:#94a3b8">${fmt(Math.round(totalIncome/52))}/week</div></div>
+        <div><div style="font-size:12px;color:#64748b">NZ Super (couple)</div><div style="font-size:20px;font-weight:800;color:#16a34a">${fmt(pensionAnnual)}/yr</div><div style="font-size:12px;color:#94a3b8">$${b.pension_weekly}/week</div></div>
+        <div><div style="font-size:12px;color:#64748b">Equity Drawdown</div><div style="font-size:20px;font-weight:800;color:#1e40af">${fmtDraw(AN)}/yr</div><div style="font-size:12px;color:#94a3b8">${fmt(Math.round(AN/52))}/week</div></div>
+        <div><div style="font-size:12px;color:#64748b">Total Income</div><div style="font-size:20px;font-weight:800;color:#1e293b">${fmt(totalIncome)}/yr</div><div style="font-size:12px;color:#94a3b8">${fmt(Math.round(totalIncome/52))}/week</div></div>
         <div><div style="font-size:12px;color:#64748b">Savings</div><div style="font-size:20px;font-weight:800;color:#475569">${fmt(b.savings)}</div><div style="font-size:12px;color:#94a3b8">Emergency buffer</div></div>
       </div>
     </div>
 
-    <h3 style="font-size:16px;font-weight:700;margin-bottom:12px">Annual Expenses (edit any figure)</h3>
-    <div class="budget-grid">`;
+    <h3 style="font-size:16px;font-weight:700;margin-bottom:8px">Expenses — edit any column</h3>
+    <div style="overflow-x:auto"><div class="budget-grid" style="min-width:520px">
+      <div></div><div class="budget-hdr">Annual</div><div class="budget-hdr">Monthly</div><div class="budget-hdr">Weekly</div>`;
 
   expenses.forEach(e=>{
     if(e.section){h+=`<div class="budget-section">${e.section}</div>`;return;}
+    const annual=e.v;
+    const monthly=Math.round(annual/12);
+    const weekly=Math.round(annual/52);
     h+=`<div class="budget-cat">${e.label}</div>`;
-    h+=`<input type="number" class="budget-input" id="b_${e.k}" value="${e.v}" step="100" onchange="budgetChanged()">`;
+    h+=`<input type="number" class="budget-input" id="ba_${e.k}" value="${annual}" step="50" onchange="budgetEdited('${e.k}','a')">`;
+    h+=`<input type="number" class="budget-input" id="bm_${e.k}" value="${monthly}" step="5" onchange="budgetEdited('${e.k}','m')">`;
+    h+=`<input type="number" class="budget-input" id="bw_${e.k}" value="${weekly}" step="5" onchange="budgetEdited('${e.k}','w')">`;
   });
 
-  h+=`<div class="budget-total"><span>Total Annual Expenses</span><span id="budget-total-val" style="color:#dc2626">${fmt(totalExpenses)}</span></div>`;
-  h+=`<div class="${surplusClass}"><span>${surplus>=0?'Annual Surplus':'Annual Shortfall'}</span><span id="budget-surplus-val" style="color:${surplusColor}">${fmt(Math.abs(surplus))}/year (${fmt(Math.round(Math.abs(surplus)/52))}/week)</span></div>`;
-  h+='</div>';
+  // Totals row
+  const totalMonthly=Math.round(totalExpenses/12);
+  const totalWeekly=Math.round(totalExpenses/52);
+  h+=`<div class="budget-total"><span>Total Expenses</span><span style="color:#dc2626">${fmt(totalExpenses)}/yr &nbsp;|&nbsp; ${fmt(totalMonthly)}/mo &nbsp;|&nbsp; ${fmt(totalWeekly)}/wk</span></div>`;
+
+  // Surplus/deficit row
+  const surpMonthly=Math.round(Math.abs(surplus)/12);
+  const surpWeekly=Math.round(Math.abs(surplus)/52);
+  h+=`<div class="${surplusClass}"><span>${surplus>=0?'Surplus':'Shortfall'}</span><span style="color:${surplusColor}">${fmt(Math.abs(surplus))}/yr &nbsp;|&nbsp; ${fmt(surpMonthly)}/mo &nbsp;|&nbsp; ${fmt(surpWeekly)}/wk</span></div>`;
+  h+='</div></div>';
 
   if(surplus<0){
-    h+=`<div class="info-box info-red" style="margin-top:16px"><strong>You're ${fmt(Math.abs(surplus))}/year short.</strong> Either increase the drawdown (use the slider above) or reduce expenses. Your $${b.savings.toLocaleString()} savings could cover this shortfall for about ${Math.floor(b.savings/Math.abs(surplus))} years.</div>`;
+    h+=`<div class="info-box info-red" style="margin-top:16px"><strong>You're ${fmt(Math.abs(surplus))}/year short</strong> (${fmt(surpWeekly)}/week). Increase the drawdown slider or reduce expenses. Your ${fmt(b.savings)} savings could cover this for about ${Math.floor(b.savings/Math.abs(surplus))} years.</div>`;
   } else {
-    h+=`<div class="info-box info-green" style="margin-top:16px"><strong>You have ${fmt(surplus)}/year surplus</strong> (${fmt(Math.round(surplus/52))}/week). This gives you breathing room for unexpected costs. You could also reduce the drawdown to preserve more equity.</div>`;
+    h+=`<div class="info-box info-green" style="margin-top:16px"><strong>${fmt(surplus)}/year surplus</strong> (${fmt(surpWeekly)}/week). Breathing room for unexpected costs — or reduce the drawdown to preserve more equity.</div>`;
   }
-
-  h+=`<div style="margin-top:20px;padding:16px;background:#f8fafc;border-radius:12px;font-size:13px;color:#64748b">
-    <strong>Weekly breakdown:</strong> Income ${fmt(Math.round(totalIncome/52))}/wk — Expenses ${fmt(Math.round(totalExpenses/52))}/wk — ${surplus>=0?'Surplus':'Shortfall'} ${fmt(Math.round(Math.abs(surplus)/52))}/wk</div>`;
 
   h+='</div>';
   document.getElementById('tab-budget').innerHTML=h;
 }
 
-function budgetChanged(){
-  const keys=Object.keys(defaultBudget).filter(k=>k!=='pension_weekly'&&k!=='savings');
-  keys.forEach(k=>{const el=document.getElementById('b_'+k);if(el)budget[k]=parseFloat(el.value)||0;});
+function budgetEdited(key, source){
+  let val;
+  if(source==='a'){
+    val=parseFloat(document.getElementById('ba_'+key).value)||0;
+  } else if(source==='m'){
+    val=Math.round((parseFloat(document.getElementById('bm_'+key).value)||0)*12);
+  } else {
+    val=Math.round((parseFloat(document.getElementById('bw_'+key).value)||0)*52);
+  }
+  budget[key]=val;
   saveBudget(budget);
+  // Update the other two fields without full re-render (avoids losing focus)
+  if(source!=='a'){const el=document.getElementById('ba_'+key);if(el)el.value=val;}
+  if(source!=='m'){const el=document.getElementById('bm_'+key);if(el)el.value=Math.round(val/12);}
+  if(source!=='w'){const el=document.getElementById('bw_'+key);if(el)el.value=Math.round(val/52);}
+  // Update totals
+  const totalExpenses=Object.keys(budget).filter(k=>k!=='pension_weekly'&&k!=='savings').reduce((s,k)=>s+(budget[k]||0),0);
+  const totalIncome=budget.pension_weekly*52+AN;
+  const surplus=totalIncome-totalExpenses;
+  // Re-render totals section only by doing full render (simplest)
   renderBudget();
 }
 
